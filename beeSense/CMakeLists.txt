@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(beeSense beeSense.c inc/ssd1306.c matriz_leds.c)
+add_executable(beeSense beeSense.c inc/ssd1306.c inc/matriz_leds.c)
 
 # Generate PIO header
 pico_generate_pio_header(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_LIST_DIR}/pio_matrix.pio)

@@ -4,28 +4,28 @@
   "editor": "wokwi",
   "parts": [
     { "type": "wokwi-breadboard-mini", "id": "bb1", "top": 0, "left": 0, "attrs": {} },
-    { "type": "board-ssd1306", "id": "oled1", "top": 60, "left": 80, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled1", "top": 60.74, "left": 86.63, "attrs": {} },
     {
       "type": "wokwi-pushbutton",
       "id": "btn1",
-      "top": 83,
+      "top": 25.4,
       "left": 240,
-      "attrs": { "color": "blue", "label": "B" }
+      "attrs": { "color": "blue", "label": "A" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
       "top": 216,
-      "left": 316.25,
+      "left": 287.45,
       "rotate": 90,
       "attrs": { "value": "10000" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn2",
-      "top": 25.4,
+      "top": 92.6,
       "left": 240,
-      "attrs": { "color": "red", "label": "A" }
+      "attrs": { "color": "red", "label": "B" }
     },
     {
       "type": "wokwi-resistor",
@@ -45,36 +45,12 @@
       "attrs": { "builder": "pico-sdk" }
     },
     {
-      "type": "wokwi-led",
-      "id": "led1",
-      "top": 385.6,
-      "left": 109.8,
-      "rotate": 180,
-      "attrs": { "color": "green" }
-    },
-    {
-      "type": "wokwi-resistor",
-      "id": "r3",
-      "top": 350.4,
-      "left": 105.05,
-      "rotate": 90,
-      "attrs": { "value": "220" }
-    },
-    {
-      "type": "wokwi-led",
-      "id": "led2",
-      "top": 385.6,
-      "left": 90.6,
-      "rotate": 180,
-      "attrs": { "color": "blue" }
-    },
-    {
       "type": "wokwi-resistor",
       "id": "r4",
-      "top": 350.4,
-      "left": 85.85,
+      "top": 312,
+      "left": 114.65,
       "rotate": 90,
-      "attrs": { "value": "220" }
+      "attrs": { "value": "110" }
     },
     { "type": "wokwi-neopixel", "id": "rgb1", "top": 159.7, "left": -97, "attrs": {} },
     { "type": "wokwi-neopixel", "id": "rgb2", "top": 159.7, "left": -135.4, "attrs": {} },
@@ -100,7 +76,54 @@
     { "type": "wokwi-neopixel", "id": "rgb22", "top": 6.1, "left": -135.4, "attrs": {} },
     { "type": "wokwi-neopixel", "id": "rgb23", "top": 6.1, "left": -173.8, "attrs": {} },
     { "type": "wokwi-neopixel", "id": "rgb24", "top": 6.1, "left": -212.2, "attrs": {} },
-    { "type": "wokwi-neopixel", "id": "rgb25", "top": 6.1, "left": -250.6, "attrs": {} }
+    { "type": "wokwi-neopixel", "id": "rgb25", "top": 6.1, "left": -250.6, "attrs": {} },
+    {
+      "type": "wokwi-analog-joystick",
+      "id": "joystick1",
+      "top": -137.5,
+      "left": 90.7,
+      "rotate": 90,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "rgb26",
+      "top": 341.04,
+      "left": 110.06,
+      "rotate": 180,
+      "attrs": { "common": "cathode" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 312,
+      "left": 105.05,
+      "rotate": 90,
+      "attrs": { "value": "33" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": 312,
+      "left": 95.45,
+      "rotate": 90,
+      "attrs": { "value": "33" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": -112.8,
+      "left": -75,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz2",
+      "top": -112.8,
+      "left": 241.8,
+      "attrs": { "volume": "0.1" }
+    },
+    { "type": "wokwi-microphone", "id": "mic1", "top": -84.18, "left": -139.41, "attrs": {} }
   ],
   "connections": [
     ["bb1:2b.f", "bb1:2t.e", "black", ["v0"]],
@@ -126,13 +149,7 @@
     ["btn1:1.l", "btn2:1.l", "black", ["h-19.2", "v-57.6"]],
     ["bb1:2b.j", "pico1:GND.8", "black", ["v56.2", "h-12"]],
     ["bb1:4b.j", "pico1:GP15", "purple", ["v75.4", "h141.6", "v96", "h-9.6"]],
-    ["bb1:5b.j", "pico1:GP14", "orange", ["v85", "h141.6", "v96", "h-28.84"]],
-    ["pico1:GP12", "led1:A", "limegreen", ["v19.2", "h-9.56"]],
-    ["r3:2", "led1:C", "black", ["h0"]],
-    ["r3:1", "pico1:GND.4", "black", ["h0"]],
-    ["led2:A", "pico1:GP11", "blue", ["v-105.6", "h19.2"]],
-    ["r4:2", "led2:C", "black", ["h0"]],
-    ["r4:1", "r3:1", "black", ["h0"]],
+    ["bb1:5b.j", "pico1:GP14", "orange", ["v85", "h141.6", "v90.58", "h-28.84"]],
     ["rgb2:DIN", "rgb1:DOUT", "gray", ["h8.8", "v9.6", "h28.8"]],
     ["rgb2:DOUT", "rgb3:DIN", "gray", ["h-9.6", "v-10.5"]],
     ["rgb3:DOUT", "rgb4:DIN", "gray", ["h-9.6", "v-10.5"]],
@@ -189,7 +206,33 @@
     ["rgb22:VSS", "rgb21:VSS", "gray", ["v8.7", "h37.6"]],
     ["rgb16:DOUT", "rgb21:DIN", "gray", ["h-9.6", "v-20.1", "h38.4", "v-28.8"]],
     ["rgb21:VDD", "bb1:3b.g", "red", ["h0", "v-9.6", "h86.4", "v86.4"]],
-    ["rgb21:VSS", "bb1:2b.h", "black", ["v-0.9", "h56.8", "v76.8"]]
+    ["rgb21:VSS", "bb1:2b.h", "black", ["v-0.9", "h56.8", "v76.8"]],
+    ["bb1:3t.a", "joystick1:VCC", "red", ["v0"]],
+    ["bb1:2t.b", "joystick1:GND", "black", ["v-30.2", "h0.2", "v-48"]],
+    ["pico1:GP27", "bb1:6b.j", "magenta", ["v-67.51", "h-9.6"]],
+    ["pico1:GP26", "bb1:7b.j", "violet", ["v-72.02", "h-7.2"]],
+    ["pico1:GP22", "bb1:8b.j", "#8f4814", ["v-57.91", "h-12.81", "v-19.2", "h-3.99"]],
+    ["bb1:6b.f", "bb1:6t.e", "magenta", ["v0"]],
+    ["bb1:7b.f", "bb1:7t.e", "violet", ["v0"]],
+    ["bb1:8b.f", "bb1:8t.e", "#8f4814", ["v0"]],
+    ["bb1:6t.a", "joystick1:VERT", "magenta", ["v-16.96", "h0.05", "v-80.44"]],
+    ["bb1:7t.a", "joystick1:HORZ", "violet", ["v-24.5", "h0.47", "v-63.3"]],
+    ["bb1:8t.a", "joystick1:SEL", "#8f4814", ["v-30.2", "h0.09", "v-48"]],
+    ["pico1:GP13", "r4:1", "red", ["v0"]],
+    ["pico1:GP12", "r3:1", "blue", ["v0"]],
+    ["pico1:GP11", "r5:1", "green", ["v0"]],
+    ["rgb26:R", "r4:2", "red", ["v0"]],
+    ["rgb26:COM", "pico1:GND.4", "black", ["v-3.07", "h19.5"]],
+    ["r3:2", "rgb26:B", "blue", ["h0", "v8.4", "h-19.2"]],
+    ["r5:2", "rgb26:G", "green", ["h-0.4", "v23.24"]],
+    ["pico1:GP21", "bb1:1b.j", "white", ["v-48.31", "h-105.6"]],
+    ["bb1:1b.f", "bb1:1t.e", "white", ["v0"]],
+    ["bb1:1t.a", "bz1:2", "white", ["v-30.2", "h-50.4"]],
+    ["bb1:2t.c", "bz1:1", "black", ["v-42.94", "h-69.6"]],
+    ["pico1:GP10", "bz2:2", "white", ["v19.2", "h95.75", "v-307.2", "h67.39", "v-19.2"]],
+    ["bz2:1", "bb1:17t.b", "black", ["v9.6", "h-67.2", "v28.8"]],
+    ["pico1:GP28", "mic1:1", "gray", ["v-9.86", "h-72.98", "v-207.84", "h-29.19", "v-15.1", "h-70.63"]],
+    ["mic1:2", "bz1:1", "black", ["v0"]]
   ],
   "dependencies": {}
 }
