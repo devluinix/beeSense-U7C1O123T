@@ -65,7 +65,7 @@ typedef struct
     const char *nome;
     float min_temp;
     float max_temp;
-    int unidade;
+    int unidade_ideal;
     float peso_mel_anual;
     const char *genero;
 } BeeSpecies;
