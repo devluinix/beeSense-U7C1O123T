@@ -197,3 +197,33 @@ void actionMatriz(int key, PIO pio, uint sm)
         imprimir_desenho(frame, pio, sm);
     }
 }
+
+void clearMatriz(PIO pio, uint sm)
+{
+    Matriz_leds_config frame = {
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0}};
+    imprimir_desenho(frame, pio, sm);
+}
+
+void actionMatrizPattern(bool pattern[5][5], PIO pio, uint sm)
+{
+    const RGB_cod red = {0.1, 0, 0};
+    const RGB_cod orange = {0.2, 0.1, 0};
+    const RGB_cod yellow = {0.3, 0.2, 0};
+    const RGB_cod limon = {0.1, 0.3, 0};
+    const RGB_cod green = {0, 0.4, 0};
+    const RGB_cod blk = {0, 0, 0};
+
+    Matriz_leds_config frame = {
+        {pattern[0][0] ? green : blk, pattern[0][1] ? green : blk, pattern[0][2] ? green : blk, pattern[0][3] ? green : blk, pattern[0][4] ? green : blk},
+        {pattern[1][0] ? limon : blk, pattern[1][1] ? limon : blk, pattern[1][2] ? limon : blk, pattern[1][3] ? limon : blk, pattern[1][4] ? limon : blk},
+        {pattern[2][0] ? yellow : blk, pattern[2][1] ? yellow : blk, pattern[2][2] ? yellow : blk, pattern[2][3] ? yellow : blk, pattern[2][4] ? yellow : blk},
+        {pattern[3][0] ? orange : blk, pattern[3][1] ? orange : blk, pattern[3][2] ? orange : blk, pattern[3][3] ? orange : blk, pattern[3][4] ? orange : blk},
+        {pattern[4][0] ? red : blk, pattern[4][1] ? red : blk, pattern[4][2] ? red : blk, pattern[4][3] ? red : blk, pattern[4][4] ? red : blk}};
+
+    imprimir_desenho(frame, pio, sm);
+}

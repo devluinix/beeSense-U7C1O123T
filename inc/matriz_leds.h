@@ -16,7 +16,7 @@ uint32_t gerar_binario_cor(double red, double green, double blue);
 uint configurar_matriz(PIO pio);
 
 void imprimir_desenho(Matriz_leds_config configuracao, PIO pio, uint sm);
-
-void actionMatriz(int key, PIO pio, uint sm);
+void clearMatriz(PIO pio, uint sm);
+void actionMatrizPattern(bool pattern[5][5], PIO pio, uint sm);
 
 RGB_cod obter_cor_por_parametro_RGB(int red, int green, int blue);

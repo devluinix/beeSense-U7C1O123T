@@ -4,18 +4,23 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/adc.h"
+#include "hardware/pio.h"
 #include "hardware/gpio.h"
 #include "hardware/pwm.h"
 #include "pico/time.h"
 #include "inc/ssd1306.h"
+#include "inc/matriz_leds.h"
 #include "math.h"
 
+// I2C definições
 #define I2C_PORT i2c1
 #define SDA_PIN 14
 #define SCL_PIN 15
 #define SSD1306_ADDR 0x3C
 #define LCD_WIDTH 128
 #define LCD_HEIGHT 64
+
+#define MATRIX_PIN 7
 
 // Potenciômetro (GPIO26 = ADC0)
 #define POT_ADC_TEMP 0
@@ -48,7 +53,8 @@ typedef enum
 {
     STATE_WELCOME,
     STATE_MENU,
-    STATE_CONFIRM
+    STATE_CONFIRM,
+    STATE_CONFIG
 } SystemState;
 
 volatile bool alarm_active = true;
@@ -56,10 +62,13 @@ volatile int simulation_mode = 0;
 volatile int state = STATE_WELCOME;
 volatile uint32_t last_button_a_time = 0;
 volatile uint32_t last_button_b_time = 0;
-volatile int menu_index = 0;
+volatile int especie_index = 0;
+volatile int sensor_index = 0;
+bool is_configuring = false;
 
-#define NUM_SPECIES 12
+#define NUM_especies 12
 
+// Especies de Abelhas
 typedef struct
 {
     const char *nome;
@@ -67,22 +76,41 @@ typedef struct
     float max_temp;
     int unidade_ideal;
     float peso_mel_anual;
+    float max_luz;
     const char *genero;
-} BeeSpecies;
+} Beeespecies;
 
-const BeeSpecies species[NUM_SPECIES] = {
-    {"Africana", 30.0, 36.0, 65, 50.0, "Apis Mellifera"},
-    {"Irai", 26.0, 34.0, 70, 3.5, "Frieseomelitta"},
-    {"Limao", 26.0, 34.0, 70, 0.7, "Lestrimelitta"},
-    {"Tiuba", 26.0, 34.0, 70, 2.8, "Melipona"},
-    {"Mandacaia", 22.0, 32.0, 70, 3.5, "Melipona"},
-    {"Urucu", 26.0, 34.0, 70, 7.0, "Melipona"},
-    {"Tataira", 22.0, 32.0, 70, 1.4, "Oxytrigona"},
-    {"Mirim", 22.0, 32.0, 70, 0.7, "Plebeia"},
-    {"Jandaira", 26.0, 34.0, 70, 2.8, "Scaptotrigona"},
-    {"Bora", 26.0, 34.0, 70, 4.2, "Tetragona"},
-    {"Jatai", 22.0, 32.0, 70, 1.4, "Tetragonisca"},
-    {"Mandaguari", 22.0, 32.0, 70, 1.4, "Trigona"}};
+const Beeespecies especies[NUM_especies] = {
+    {"Africana", 30.0, 36.0, 65, 50.0, 5.0, "Apis Mellifera"},
+    {"Irai", 26.0, 34.0, 70, 3.5, 2.8, "Frieseomelitta"},
+    {"Limao", 26.0, 34.0, 70, 0.7, 1.4, "Lestrimelitta"},
+    {"Tiuba", 26.0, 34.0, 70, 2.8, 2.8, "Melipona"},
+    {"Mandacaia", 22.0, 32.0, 70, 3.5, 4.2, "Melipona"},
+    {"Urucu", 26.0, 34.0, 70, 7.0, 4.2, "Melipona"},
+    {"Tataira", 22.0, 32.0, 70, 1.4, 2.8, "Oxytrigona"},
+    {"Mirim", 22.0, 32.0, 70, 0.7, 1.4, "Plebeia"},
+    {"Jandaira", 26.0, 34.0, 70, 2.8, 4.2, "Scaptotrigona"},
+    {"Bora", 26.0, 34.0, 70, 4.2, 4.2, "Tetragona"},
+    {"Jatai", 22.0, 32.0, 70, 1.4, 2.8, "Tetragonisca"},
+    {"Mandaguari", 22.0, 32.0, 70, 1.4, 2.8, "Trigona"}};
+
+// Sensores Extras
+typedef struct
+{
+    const char *nome;
+    float min;
+    float max;
+    float value;
+} Sensores;
+
+#define NUM_SENSORES 4
+
+volatile Sensores sensores[] = {
+    {"Peso", 0.0, 60.0, 2.0},
+    {"Luminosidade", 0.0, 100.0, 3.0},
+    {"Gas VOC", 0.0, 15.0, 0.5},
+    {"Vibracao", 0.0, 100.0, 50.0},
+};
 
 ssd1306_t ssd;
 
@@ -127,7 +155,14 @@ void gpio_callback(uint gpio, uint32_t events)
         }
         else if (state == STATE_MENU)
         {
-            menu_index = (menu_index + 1) % NUM_SPECIES;
+            especie_index = (especie_index + 1) % NUM_especies;
+            beep_frequency = 500;
+            beep_duration = 5;
+            play_tone = true;
+        }
+        else if (state == STATE_CONFIG)
+        {
+            sensor_index = (sensor_index + 1) % NUM_SENSORES;
             beep_frequency = 500;
             beep_duration = 5;
             play_tone = true;
@@ -148,31 +183,18 @@ void gpio_callback(uint gpio, uint32_t events)
         }
         else if (state == STATE_CONFIRM)
         {
-            simulation_mode = (simulation_mode + 1) % 2;
+            beep_duration = 200;
+            state = STATE_CONFIG;
+            // simulation_mode = (simulation_mode + 1) % 2;
+        }
+        else if (state == STATE_CONFIG)
+        {
+            beep_duration = 200;
+            state = STATE_CONFIRM;
         }
         beep_frequency = (state == STATE_MENU) ? 800 : 1000;
         play_tone = true;
         last_button_b_time = now;
-    }
-}
-
-// Desenha matriz 5x5; cada célula: 4x4 pixels com espaçamento de 1
-void draw_matrix(uint8_t x, uint8_t y, bool pattern[5][5])
-{
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            uint8_t cell_x = x + j * 5;
-            uint8_t cell_y = y + i * 5;
-            for (uint8_t dx = 0; dx < 4; dx++)
-            {
-                for (uint8_t dy = 0; dy < 4; dy++)
-                {
-                    ssd1306_pixel(&ssd, cell_x + dx, cell_y + dy, pattern[i][j]);
-                }
-            }
-        }
     }
 }
 
@@ -234,6 +256,11 @@ int main()
     // Configura buzzer para PWM
     gpio_set_function(BUZZER_A, GPIO_FUNC_PWM);
 
+    // Configura matrix de leds
+    PIO pio = pio0;
+    uint sm = configurar_matriz(pio);
+    clearMatriz(pio, sm);
+
     uint32_t loop_counter = 0;
     while (true)
     {
@@ -245,6 +272,7 @@ int main()
         adc_select_input(POT_ADC_TEMP);
         uint16_t pot_val = adc_read();
         float temp = -6.0f + (pot_val * (45.0f + 6.0f)) / 4095.0f;
+        float valor_sensor = sensores[sensor_index].min + (pot_val * (sensores[sensor_index].max + sensores[sensor_index].min)) / 4095.0f;
 
         adc_select_input(POT_ADC_UMID);
         uint16_t umid_val = adc_read();
@@ -253,6 +281,8 @@ int main()
         float red = 0;
         float green = 0;
         float blue = 0;
+
+        float final_ratio = 0.0f;
 
         ssd1306_fill(&ssd, false);
         if (state == STATE_WELCOME)
@@ -267,20 +297,36 @@ int main()
         {
             ssd1306_draw_string(&ssd, "Especie:", 0, 0);
             char buffer[32];
-            snprintf(buffer, sizeof(buffer), "%d: %s", menu_index + 1, species[menu_index].nome);
+            snprintf(buffer, sizeof(buffer), "%d: %s", especie_index + 1, especies[especie_index].nome);
+            ssd1306_draw_string(&ssd, buffer, 0, 20);
+            ssd1306_draw_string(&ssd, "A: Proximo", 0, 40);
+            ssd1306_draw_string(&ssd, "B: Selecionar", 0, 50);
+        }
+        else if (state == STATE_CONFIG)
+        {
+            is_configuring = true;
+            char buffer[32];
+            snprintf(buffer, sizeof(buffer), "Sensor: %.1f", valor_sensor);
+            ssd1306_draw_string(&ssd, buffer, 0, 0);
+            snprintf(buffer, sizeof(buffer), "%d: %s", sensor_index + 1, sensores[sensor_index].nome);
             ssd1306_draw_string(&ssd, buffer, 0, 20);
             ssd1306_draw_string(&ssd, "A: Proximo", 0, 40);
             ssd1306_draw_string(&ssd, "B: Selecionar", 0, 50);
         }
         else if (state == STATE_CONFIRM)
         {
+            if (is_configuring)
+            {
+                is_configuring = false;
+                sensores[sensor_index].value = valor_sensor;
+            }
             // LEDs indicam estado do alarme
 
             if (alarm_active)
             {
                 // Valores ideais
                 float ideal_umid = 70.0f;
-                float ideal_temp = (species[menu_index].min_temp + species[menu_index].max_temp) / 2.0f;
+                float ideal_temp = (especies[especie_index].min_temp + especies[especie_index].max_temp) / 2.0f;
 
                 // Índice de temperatura (assimétrico)
                 // Se temp <= ideal: mapeia de ideal a (ideal -15) para índice de 1.0 a 0.0
@@ -307,7 +353,9 @@ int main()
                     H_ratio = 1;
 
                 // Combinação ponderada: temperatura tem mais peso
-                float final_ratio = (0.85f * T_ratio + 0.15f * H_ratio) / (0.85f + 0.15f);
+                final_ratio = (0.85f * T_ratio + 0.15f * H_ratio) / (0.85f + 0.15f);
+
+                // final_ratio vai de 0 a 1
 
                 // Degradê de cor:  final_ratio = 1 -> verde; = 0 -> vermelho; intermediário = amarelo
                 green = final_ratio * 10.0f;
@@ -318,44 +366,68 @@ int main()
             {
                 // Atualiza display
                 char info[32];
-                snprintf(info, sizeof(info), "Temp: %.1f C", temp);
+                snprintf(info, sizeof(info), "Temp : %.1f C", temp);
                 ssd1306_draw_string(&ssd, info, 0, 0);
-                snprintf(info, sizeof(info), "Umid: %.1f %%", umid);
+                snprintf(info, sizeof(info), "Umid : %.1f %%", umid);
                 ssd1306_draw_string(&ssd, info, 0, 10);
-                snprintf(info, sizeof(info), "Alarm: %s", alarm_active ? "ON" : "OFF");
+                snprintf(info, sizeof(info), "Luz  : %.1f %%", sensores[1].value);
                 ssd1306_draw_string(&ssd, info, 0, 20);
-                snprintf(info, sizeof(info), "Mode : %d", simulation_mode);
+                snprintf(info, sizeof(info), "VOC  : %.1f ppm", sensores[2].value);
                 ssd1306_draw_string(&ssd, info, 0, 30);
+                snprintf(info, sizeof(info), "Peso : %.1f Kg", sensores[0].value);
+                ssd1306_draw_string(&ssd, info, 0, 40);
+                snprintf(info, sizeof(info), "Alarm: %s", alarm_active ? "ON" : "OFF");
+                ssd1306_draw_string(&ssd, info, 0, 55);
+                // snprintf(info, sizeof(info), "Mode  : %d", simulation_mode);
+                // ssd1306_draw_string(&ssd, info, 0, 60);
 
                 // Matriz 5x5 varia conforme simulation_mode
                 bool matrix_pattern[5][5];
                 if (!alarm_active)
                 {
+                    // LIMPANDO MATRIZ
                     for (int i = 0; i < 5; i++)
                         for (int j = 0; j < 5; j++)
-                            matrix_pattern[i][j] = (i == j);
+                            matrix_pattern[i][j] = false;
                 }
                 else
                 {
-                    bool on = loop_counter >= 5;
+
+                    // DEFININDO INDICADORES DA MATRIZ
+                    // 0 Peso
+                    // 1 Luminosidade
+                    // 2 Gas VOC"
+                    // 3 Vibracao
                     for (int i = 0; i < 5; i++)
                         for (int j = 0; j < 5; j++)
-                            matrix_pattern[i][j] = on;
+                            matrix_pattern[i][j] = false;
+
+                    int peso_ideal = (int)((sensores[0].value - 0) / (especies[especie_index].peso_mel_anual - 0) * 4.0f);
+                    matrix_pattern[4 - peso_ideal][0] = true;
+                    int luminosidade_ideal = (int)((sensores[1].max - especies[especie_index].max_luz) / (sensores[1].max - sensores[1].min) * 4.0f);
+                    matrix_pattern[4 - luminosidade_ideal][1] = true;
+                    int voc_ideal = (int)((8.0f - sensores[2].value) / (8.0f - 0) * 4.0f);
+                    matrix_pattern[4 - voc_ideal][2] = true;
+                    int vibracao_ideal = (int)((sensores[3].value - 0) / (100.0f - 0) * 4.0f);
+                    matrix_pattern[4 - vibracao_ideal][3] = true;
+
+                    int final_ratio_index = (int)(final_ratio * 4.0f);
+                    matrix_pattern[4 - final_ratio_index][4] = true;
                 }
-                draw_matrix(90, 30, matrix_pattern);
+                actionMatrizPattern(matrix_pattern, pio, sm);
             }
             else if (simulation_mode == 1)
             {
-                ssd1306_draw_string(&ssd, species[menu_index].nome, 15, 0);
+                ssd1306_draw_string(&ssd, especies[especie_index].nome, 15, 0);
                 ssd1306_draw_char(&ssd, '>', 0, 0);
                 char buffer[32];
-                snprintf(buffer, sizeof(buffer), "%s", species[menu_index].genero);
+                snprintf(buffer, sizeof(buffer), "%s", especies[especie_index].genero);
                 ssd1306_draw_string(&ssd, buffer, 0, 10);
-                snprintf(buffer, sizeof(buffer), "Max: %.1f C", species[menu_index].max_temp);
+                snprintf(buffer, sizeof(buffer), "Max: %.1f C", especies[especie_index].max_temp);
                 ssd1306_draw_string(&ssd, buffer, 0, 30);
-                snprintf(buffer, sizeof(buffer), "Min: %.1f C", species[menu_index].min_temp);
+                snprintf(buffer, sizeof(buffer), "Min: %.1f C", especies[especie_index].min_temp);
                 ssd1306_draw_string(&ssd, buffer, 0, 40);
-                snprintf(buffer, sizeof(buffer), "Peso: %.1f", species[menu_index].peso_mel_anual);
+                snprintf(buffer, sizeof(buffer), "Peso: %.1f", especies[especie_index].peso_mel_anual);
                 ssd1306_draw_string(&ssd, buffer, 0, 50);
             }
         }
@@ -369,6 +441,12 @@ int main()
         pwm_set_gpio_level(LED_RED, red / 255.0 * 65535);
         pwm_set_gpio_level(LED_GREEN, green / 255.0 * 65535);
         pwm_set_gpio_level(LED_BLUE, blue / 255.0 * 65535);
+
+        if (loop_counter == 0)
+        {
+            printf("{ \"temp\": %.1f, \"umid\": %.1f, \"peso\": %.1f, \"luz\": %.1f, \"voc\": %.1f, \"vibra\": %.1f }\n",
+                   temp, umid, sensores[0].value, sensores[1].value, sensores[2].value, sensores[3].value);
+        }
 
         ssd1306_send_data(&ssd);
         sleep_ms(100);
