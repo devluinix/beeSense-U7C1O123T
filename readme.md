@@ -12,6 +12,9 @@ Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilant
 
 ## Funcionalidades
 
+- **Fluxograma de Funcionamento:**
+  ![Fluxograma do BeeSense](inc/img17.jpg)
+
 - **Monitoramento de Parâmetros:** Leitura contínua dos sensores de temperatura, umidade, peso, ruído, toxicidade e vibração.
 - **Interface Interativa:** Utiliza display LCD, botões, joystick, matriz LED e buzzer para exibir informações e alertas.
 - **Menu de Seleção de Espécie:** Permite ao usuário escolher a espécie de abelhas, definindo parâmetros ideais (temperatura mínima, máxima, umidade ideal e peso ideal).
@@ -20,6 +23,9 @@ Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilant
 - **Comunicação via UART:** Transmite os dados coletados para análise remota, utilizando um protocolo simples e confiável.
 
 ## Requisitos de Hardware
+
+- **Diagrama de Blocos:**
+  ![Diagrama de Blocos](inc/img11.jpg)
 
 - **Plataforma:** BitDogLab
 - **Sensores:**
