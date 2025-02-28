@@ -4,6 +4,8 @@
 
 BeeSense: Vigilante Apícola é um sistema IoT que simula o monitoramento contínuo e não invasivo das condições internas de colmeias. O projeto foi desenvolvido para identificar, de forma precoce, anomalias que possam comprometer a saúde das abelhas – essenciais para a polinização e a manutenção da biodiversidade. Além de auxiliar os apicultores na tomada de decisões, o sistema serve como ferramenta educacional para fomentar a conscientização sobre a importância das abelhas e estimular novas ideias para a apicultura sustentável.
 
+![Demonstração do BeeSense](inc/img12.jpg)
+
 ## Demonstração em Vídeo
 
 Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilante Apícola no link abaixo:
