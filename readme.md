@@ -1,4 +1,4 @@
-# BeeSense: Vigilante Apícola
+# 🐝 BeeSense: Vigilante Apícola 🐝
 
 ## Descrição
 
