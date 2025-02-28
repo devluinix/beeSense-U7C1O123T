@@ -6,12 +6,6 @@ BeeSense: Vigilante Apícola é um sistema IoT que simula o monitoramento contí
 
 ![Demonstração do BeeSense](inc/img12.jpg)
 
-## Demonstração em Vídeo
-
-Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilante Apícola no link abaixo:
-
-[![Demonstração do BeeSense](https://img.youtube.com/vi/_L8lrp-FCkk/maxresdefault.jpg)](https://youtu.be/_L8lrp-FCkk)
-
 ## Funcionalidades
 
 - **Fluxograma de Funcionamento:**
@@ -31,6 +25,12 @@ Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilant
 
 - **Diagrama de Blocos:**
   ![Diagrama de Blocos](inc/img11.jpg)
+
+## Demonstração em Vídeo
+
+Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilante Apícola no link abaixo:
+
+[![Demonstração do BeeSense](https://img.youtube.com/vi/_L8lrp-FCkk/maxresdefault.jpg)](https://youtu.be/_L8lrp-FCkk)
 
 - **Plataforma:** BitDogLab
 - **Sensores:**
