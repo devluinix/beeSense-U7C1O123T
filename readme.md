@@ -24,6 +24,9 @@ Você pode assistir a uma demonstração em vídeo do sistema BeeSense: Vigilant
 - **Geração de Relatório:** Compara os dados atuais com os parâmetros definidos e apresenta um diagnóstico da qualidade das colmeias.
 - **Comunicação via UART:** Transmite os dados coletados para análise remota, utilizando um protocolo simples e confiável.
 
+- **Imagem do Relatório:**
+  ![Imagem do Relatório](inc/img18.jpg)
+
 ## Requisitos de Hardware
 
 - **Diagrama de Blocos:**
